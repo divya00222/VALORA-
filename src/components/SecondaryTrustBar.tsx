@@ -26,8 +26,8 @@ export const SecondaryTrustBar: React.FC = () => {
   ];
 
   return (
-    <section className="bg-[#FAF8F6] border-y border-[#E8E2DF] py-6 my-8">
-      <div className="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-6">
+    <section className="max-w-7xl mx-auto px-4 my-12">
+      <div className="bg-[#FAF8F6] border border-[#E8E2DF] rounded-3xl py-8 px-8 grid grid-cols-2 md:grid-cols-4 gap-6 shadow-sm">
         {items.map((item, idx) => {
           const Icon = item.icon;
           return (

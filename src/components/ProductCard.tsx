@@ -72,14 +72,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
       {/* PRODUCT IMAGE CONTAINER */}
       <div
-        className="relative bg-[#FAF8F6] p-6 flex items-center justify-center cursor-pointer overflow-hidden aspect-[4/3]"
+        className="relative bg-[#FAF8F6] p-0 flex items-center justify-center cursor-pointer overflow-hidden aspect-square"
         onClick={() => onSelectProduct(product)}
       >
         <img
           src={currentImage}
           alt={product.name}
           referrerPolicy="no-referrer"
-          className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
         />
       </div>
 
