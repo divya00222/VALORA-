@@ -1,27 +1,27 @@
 import React from 'react';
-import { ShieldCheck, Headphones, Award, Gift } from 'lucide-react';
+import { Truck, CreditCard, RotateCcw, ShieldCheck } from 'lucide-react';
 
 export const TrustBar: React.FC = () => {
   const features = [
     {
+      icon: CreditCard,
+      title: 'CASH ON DELIVERY',
+      subtitle: 'Available across Nepal',
+    },
+    {
       icon: ShieldCheck,
-      title: 'SECURE PAYMENT',
-      subtitle: '100% secure & trusted',
+      title: 'SECURE PAYMENTS',
+      subtitle: 'Trusted digital options',
     },
     {
-      icon: Headphones,
-      title: '24/7 CUSTOMER SUPPORT',
-      subtitle: "We're here to help anytime",
+      icon: RotateCcw,
+      title: 'EASY RETURNS',
+      subtitle: '7-day return policy',
     },
     {
-      icon: Award,
-      title: 'PREMIUM QUALITY',
-      subtitle: 'Stylish, durable & elegant',
-    },
-    {
-      icon: Gift,
-      title: 'SPECIAL OFFERS',
-      subtitle: 'Exciting deals & discounts',
+      icon: Truck,
+      title: 'NATIONWIDE DELIVERY',
+      subtitle: 'We deliver to all districts',
     },
   ];
 

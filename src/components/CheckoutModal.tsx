@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { X, CheckCircle, ShieldCheck, CreditCard, Truck, Lock, ArrowLeft } from 'lucide-react';
-import { CartItem } from '../types';
+import { X, CheckCircle, ShieldCheck, CreditCard, Truck, Lock, ArrowLeft, Landmark, Wallet, Phone } from 'lucide-react';
+import { CartItem, NepalAddress, NepalPaymentMethod } from '../types';
+import { STORE_CONFIG, NEPAL_REGIONS } from '../config';
 
 interface CheckoutModalProps {
   isOpen: boolean;
@@ -16,35 +17,40 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   onOrderSuccess,
 }) => {
   const [step, setStep] = useState<'shipping' | 'payment' | 'confirmed'>('shipping');
-  const [shippingInfo, setShippingInfo] = useState({
-    firstName: 'Eleanor',
-    lastName: 'Vance',
-    email: 'eleanor.vance@example.com',
-    address: '450 Park Avenue, Apt 14B',
-    city: 'New York',
-    state: 'NY',
-    zip: '10022',
-    country: 'United States',
+  const [address, setAddress] = useState<NepalAddress>({
+    fullName: '',
+    mobileNumber: '',
+    email: '',
+    province: '',
+    district: '',
+    municipality: '',
+    wardNumber: '',
+    tole: '',
+    landmark: '',
+    instructions: '',
   });
-  const [paymentMethod, setPaymentMethod] = useState<'card' | 'applepay' | 'paypal'>('card');
-  const [cardNumber, setCardNumber] = useState('•••• •••• •••• 4242');
-  const [cardExp, setCardExp] = useState('12/28');
-  const [cardCvc, setCardCvc] = useState('888');
+  const [paymentMethod, setPaymentMethod] = useState<NepalPaymentMethod>('cod');
   const [orderNumber, setOrderNumber] = useState('');
 
   if (!isOpen) return null;
 
   const subtotal = cart.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
-  const shipping = subtotal >= 99 ? 0 : 15;
-  const tax = subtotal * 0.0825;
-  const total = subtotal + shipping + tax;
+  
+  // Calculate shipping based on location
+  const isKathmanduValley = STORE_CONFIG.shipping.kathmanduDistricts.includes(address.district);
+  const isFreeShipping = subtotal >= STORE_CONFIG.shipping.freeThreshold;
+  const shippingFee = isFreeShipping ? 0 : (isKathmanduValley ? STORE_CONFIG.shipping.valleyFee : STORE_CONFIG.shipping.outsideValleyFee);
+  
+  const total = subtotal + shippingFee;
 
   const handleCompleteOrder = () => {
-    const randomOrderNum = `VLR-${Math.floor(100000 + Math.random() * 900000)}`;
+    const randomOrderNum = `ORD-NP-${Math.floor(100000 + Math.random() * 900000)}`;
     setOrderNumber(randomOrderNum);
     setStep('confirmed');
     onOrderSuccess();
   };
+
+  const selectedProvinceData = NEPAL_REGIONS.find(r => r.province === address.province);
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
@@ -54,7 +60,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
           <div className="flex items-center space-x-2">
             <Lock className="w-4 h-4 text-[#D81B68]" />
             <span className="font-serif font-bold text-gray-900 uppercase tracking-wider text-sm">
-              VALORA Secure Checkout
+              {STORE_CONFIG.name} Secure Checkout
             </span>
           </div>
           <button
@@ -71,93 +77,131 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h3 className="font-serif text-lg font-bold text-gray-900">
-                  1. Delivery Address
+                  1. Delivery Details
                 </h3>
                 <span className="text-xs text-gray-400">Step 1 of 2</span>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-bold text-gray-700 block mb-1">First Name</label>
+                  <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1">Full Name</label>
                   <input
                     type="text"
-                    value={shippingInfo.firstName}
-                    onChange={(e) => setShippingInfo({ ...shippingInfo, firstName: e.target.value })}
+                    required
+                    placeholder="Enter your full name"
+                    value={address.fullName}
+                    onChange={(e) => setAddress({ ...address, fullName: e.target.value })}
                     className="w-full bg-[#FAF8F6] border border-[#E8E2DF] rounded-lg px-3 py-2 text-xs text-gray-900 focus:outline-none focus:border-[#D81B68]"
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-gray-700 block mb-1">Last Name</label>
+                  <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1">Mobile Number</label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">+977</span>
+                    <input
+                      type="tel"
+                      required
+                      placeholder="98XXXXXXXX"
+                      value={address.mobileNumber}
+                      onChange={(e) => setAddress({ ...address, mobileNumber: e.target.value })}
+                      className="w-full bg-[#FAF8F6] border border-[#E8E2DF] rounded-lg pl-12 pr-3 py-2 text-xs text-gray-900 focus:outline-none focus:border-[#D81B68]"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1">Province</label>
+                  <select
+                    required
+                    value={address.province}
+                    onChange={(e) => setAddress({ ...address, province: e.target.value, district: '' })}
+                    className="w-full bg-[#FAF8F6] border border-[#E8E2DF] rounded-lg px-3 py-2 text-xs text-gray-900 focus:outline-none focus:border-[#D81B68]"
+                  >
+                    <option value="">Select Province</option>
+                    {NEPAL_REGIONS.map(r => <option key={r.province} value={r.province}>{r.province}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1">District</label>
+                  <select
+                    required
+                    disabled={!address.province}
+                    value={address.district}
+                    onChange={(e) => setAddress({ ...address, district: e.target.value })}
+                    className="w-full bg-[#FAF8F6] border border-[#E8E2DF] rounded-lg px-3 py-2 text-xs text-gray-900 focus:outline-none focus:border-[#D81B68] disabled:opacity-50"
+                  >
+                    <option value="">Select District</option>
+                    {selectedProvinceData?.districts.map(d => <option key={d} value={d}>{d}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="col-span-2">
+                  <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1">Municipality / City</label>
                   <input
                     type="text"
-                    value={shippingInfo.lastName}
-                    onChange={(e) => setShippingInfo({ ...shippingInfo, lastName: e.target.value })}
+                    required
+                    placeholder="E.g. Kathmandu Metro"
+                    value={address.municipality}
+                    onChange={(e) => setAddress({ ...address, municipality: e.target.value })}
+                    className="w-full bg-[#FAF8F6] border border-[#E8E2DF] rounded-lg px-3 py-2 text-xs text-gray-900 focus:outline-none focus:border-[#D81B68]"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1">Ward No.</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="E.g. 1"
+                    value={address.wardNumber}
+                    onChange={(e) => setAddress({ ...address, wardNumber: e.target.value })}
+                    className="w-full bg-[#FAF8F6] border border-[#E8E2DF] rounded-lg px-3 py-2 text-xs text-gray-900 focus:outline-none focus:border-[#D81B68]"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1">Tole / Area</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="E.g. Durbarmarg"
+                    value={address.tole}
+                    onChange={(e) => setAddress({ ...address, tole: e.target.value })}
                     className="w-full bg-[#FAF8F6] border border-[#E8E2DF] rounded-lg px-3 py-2 text-xs text-gray-900 focus:outline-none focus:border-[#D81B68]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-bold text-gray-700 block mb-1">Email for Delivery Tracking</label>
-                <input
-                  type="email"
-                  value={shippingInfo.email}
-                  onChange={(e) => setShippingInfo({ ...shippingInfo, email: e.target.value })}
-                  className="w-full bg-[#FAF8F6] border border-[#E8E2DF] rounded-lg px-3 py-2 text-xs text-gray-900 focus:outline-none focus:border-[#D81B68]"
-                />
-              </div>
-
-              <div>
-                <label className="text-xs font-bold text-gray-700 block mb-1">Street Address</label>
+                <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1">Nearby Landmark (Optional)</label>
                 <input
                   type="text"
-                  value={shippingInfo.address}
-                  onChange={(e) => setShippingInfo({ ...shippingInfo, address: e.target.value })}
+                  placeholder="E.g. Near Narayanhiti Palace"
+                  value={address.landmark}
+                  onChange={(e) => setAddress({ ...address, landmark: e.target.value })}
                   className="w-full bg-[#FAF8F6] border border-[#E8E2DF] rounded-lg px-3 py-2 text-xs text-gray-900 focus:outline-none focus:border-[#D81B68]"
                 />
               </div>
 
-              <div className="grid grid-cols-3 gap-3">
-                <div>
-                  <label className="text-xs font-bold text-gray-700 block mb-1">City</label>
-                  <input
-                    type="text"
-                    value={shippingInfo.city}
-                    onChange={(e) => setShippingInfo({ ...shippingInfo, city: e.target.value })}
-                    className="w-full bg-[#FAF8F6] border border-[#E8E2DF] rounded-lg px-3 py-2 text-xs text-gray-900 focus:outline-none focus:border-[#D81B68]"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-bold text-gray-700 block mb-1">State</label>
-                  <input
-                    type="text"
-                    value={shippingInfo.state}
-                    onChange={(e) => setShippingInfo({ ...shippingInfo, state: e.target.value })}
-                    className="w-full bg-[#FAF8F6] border border-[#E8E2DF] rounded-lg px-3 py-2 text-xs text-gray-900 focus:outline-none focus:border-[#D81B68]"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-bold text-gray-700 block mb-1">Postal Code</label>
-                  <input
-                    type="text"
-                    value={shippingInfo.zip}
-                    onChange={(e) => setShippingInfo({ ...shippingInfo, zip: e.target.value })}
-                    className="w-full bg-[#FAF8F6] border border-[#E8E2DF] rounded-lg px-3 py-2 text-xs text-gray-900 focus:outline-none focus:border-[#D81B68]"
-                  />
-                </div>
-              </div>
-
+              {/* Delivery Info Banner */}
               <div className="p-4 bg-pink-50 rounded-xl border border-pink-100 flex items-center space-x-3 text-xs text-gray-700">
                 <Truck className="w-5 h-5 text-[#D81B68] flex-shrink-0" />
                 <div>
-                  <span className="font-bold text-gray-900 block">Complimentary White-Glove Courier Delivery</span>
-                  <span>Estimated delivery: 2-3 business days in signature branded protective storage box.</span>
+                  <span className="font-bold text-gray-900 block">Nationwide Delivery by Local Partners</span>
+                  <span>
+                    {isKathmanduValley 
+                      ? 'Kathmandu Valley: 1-2 business days delivery.' 
+                      : 'Outside Valley: 3-5 business days delivery.'}
+                  </span>
                 </div>
               </div>
 
               <button
                 onClick={() => setStep('payment')}
-                className="w-full bg-[#D81B68] hover:bg-[#A80F4F] text-white text-xs font-bold uppercase tracking-widest py-3.5 rounded-xl shadow transition"
+                disabled={!address.fullName || !address.mobileNumber || !address.district}
+                className="w-full bg-[#D81B68] hover:bg-[#A80F4F] text-white text-xs font-bold uppercase tracking-widest py-3.5 rounded-xl shadow transition disabled:opacity-50"
               >
                 Continue to Payment
               </button>
@@ -178,77 +222,82 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
               </div>
 
               <h3 className="font-serif text-lg font-bold text-gray-900">
-                2. Payment Details
+                2. Select Payment Method
               </h3>
 
-              {/* PAYMENT TABS */}
-              <div className="grid grid-cols-3 gap-3">
+              {/* PAYMENT OPTIONS */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <button
-                  onClick={() => setPaymentMethod('card')}
-                  className={`p-3 rounded-xl border text-xs font-bold flex flex-col items-center space-y-1 transition ${
-                    paymentMethod === 'card'
-                      ? 'border-[#D81B68] bg-pink-50 text-[#D81B68]'
-                      : 'border-[#E8E2DF] text-gray-700'
+                  onClick={() => setPaymentMethod('cod')}
+                  className={`p-4 rounded-xl border text-left transition flex items-center justify-between group ${
+                    paymentMethod === 'cod'
+                      ? 'border-[#D81B68] bg-pink-50'
+                      : 'border-[#E8E2DF] hover:border-gray-300'
                   }`}
                 >
-                  <CreditCard className="w-4 h-4" />
-                  <span>Credit Card</span>
+                  <div className="flex items-center space-x-3">
+                    <div className={`p-2 rounded-lg ${paymentMethod === 'cod' ? 'bg-[#D81B68] text-white' : 'bg-gray-100 text-gray-500'}`}>
+                      <CreditCard className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-gray-900">Cash on Delivery</div>
+                      <div className="text-[10px] text-gray-500">Pay when your order arrives</div>
+                    </div>
+                  </div>
+                  <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'cod' ? 'border-[#D81B68] bg-[#D81B68]' : 'border-gray-200'}`}>
+                    {paymentMethod === 'cod' && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                  </div>
                 </button>
+
                 <button
-                  onClick={() => setPaymentMethod('applepay')}
-                  className={`p-3 rounded-xl border text-xs font-bold flex flex-col items-center space-y-1 transition ${
-                    paymentMethod === 'applepay'
-                      ? 'border-[#D81B68] bg-pink-50 text-[#D81B68]'
-                      : 'border-[#E8E2DF] text-gray-700'
+                  onClick={() => setPaymentMethod('esewa')}
+                  className={`p-4 rounded-xl border text-left transition flex items-center justify-between group ${
+                    paymentMethod === 'esewa'
+                      ? 'border-[#D81B68] bg-pink-50'
+                      : 'border-[#E8E2DF] hover:border-gray-300'
                   }`}
                 >
-                  <span> Apple Pay</span>
-                  <span className="text-[10px] font-normal text-gray-500">1-Touch Express</span>
+                  <div className="flex items-center space-x-3">
+                    <div className={`p-2 rounded-lg ${paymentMethod === 'esewa' ? 'bg-[#60bb46] text-white' : 'bg-gray-100 text-gray-500'}`}>
+                      <Wallet className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-gray-900">eSewa / Khalti</div>
+                      <div className="text-[10px] text-gray-500">Fast & Secure Digital Payment</div>
+                    </div>
+                  </div>
+                  <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'esewa' ? 'border-[#D81B68] bg-[#D81B68]' : 'border-gray-200'}`}>
+                    {paymentMethod === 'esewa' && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                  </div>
                 </button>
+
                 <button
-                  onClick={() => setPaymentMethod('paypal')}
-                  className={`p-3 rounded-xl border text-xs font-bold flex flex-col items-center space-y-1 transition ${
-                    paymentMethod === 'paypal'
-                      ? 'border-[#D81B68] bg-pink-50 text-[#D81B68]'
-                      : 'border-[#E8E2DF] text-gray-700'
+                  onClick={() => setPaymentMethod('fonepay')}
+                  className={`p-4 rounded-xl border text-left transition flex items-center justify-between group ${
+                    paymentMethod === 'fonepay'
+                      ? 'border-[#D81B68] bg-pink-50'
+                      : 'border-[#E8E2DF] hover:border-gray-300'
                   }`}
                 >
-                  <span>PayPal</span>
-                  <span className="text-[10px] font-normal text-gray-500">Pay in 4</span>
+                  <div className="flex items-center space-x-3">
+                    <div className={`p-2 rounded-lg ${paymentMethod === 'fonepay' ? 'bg-[#D81B68] text-white' : 'bg-gray-100 text-gray-500'}`}>
+                      <Landmark className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-gray-900">Fonepay / Bank</div>
+                      <div className="text-[10px] text-gray-500">Scan QR or Direct Transfer</div>
+                    </div>
+                  </div>
+                  <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'fonepay' ? 'border-[#D81B68] bg-[#D81B68]' : 'border-gray-200'}`}>
+                    {paymentMethod === 'fonepay' && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                  </div>
                 </button>
               </div>
 
-              {paymentMethod === 'card' && (
-                <div className="space-y-4 bg-[#FAF8F6] p-4 rounded-xl border border-[#E8E2DF]">
-                  <div>
-                    <label className="text-xs font-bold text-gray-700 block mb-1">Card Number</label>
-                    <input
-                      type="text"
-                      value={cardNumber}
-                      onChange={(e) => setCardNumber(e.target.value)}
-                      className="w-full bg-white border border-[#E8E2DF] rounded-lg px-3 py-2 text-xs text-gray-900 focus:outline-none focus:border-[#D81B68]"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-xs font-bold text-gray-700 block mb-1">Expiration</label>
-                      <input
-                        type="text"
-                        value={cardExp}
-                        onChange={(e) => setCardExp(e.target.value)}
-                        className="w-full bg-white border border-[#E8E2DF] rounded-lg px-3 py-2 text-xs text-gray-900 focus:outline-none focus:border-[#D81B68]"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-xs font-bold text-gray-700 block mb-1">CVC / CVV</label>
-                      <input
-                        type="text"
-                        value={cardCvc}
-                        onChange={(e) => setCardCvc(e.target.value)}
-                        className="w-full bg-white border border-[#E8E2DF] rounded-lg px-3 py-2 text-xs text-gray-900 focus:outline-none focus:border-[#D81B68]"
-                      />
-                    </div>
-                  </div>
+              {/* COD Instructions */}
+              {paymentMethod === 'cod' && (
+                <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 text-[10px] text-gray-600 leading-relaxed italic">
+                  Note: Please keep the exact amount ready for our delivery partner. Cash on Delivery is available across all supported districts in Nepal.
                 </div>
               )}
 
@@ -256,19 +305,17 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
               <div className="space-y-2 text-xs text-gray-600 border-t border-[#E8E2DF] pt-4">
                 <div className="flex justify-between">
                   <span>Subtotal ({cart.reduce((a, c) => a + c.quantity, 0)} items)</span>
-                  <span className="font-semibold text-gray-900">${subtotal.toFixed(2)}</span>
+                  <span className="font-semibold text-gray-900">{STORE_CONFIG.currency.symbol} {subtotal.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Express Insured Shipping</span>
-                  <span className="font-semibold text-green-700">{shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}`}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Estimated Tax</span>
-                  <span className="font-semibold text-gray-900">${tax.toFixed(2)}</span>
+                  <span>Delivery Charge ({isKathmanduValley ? 'Inside Valley' : 'Outside Valley'})</span>
+                  <span className={`font-semibold ${shippingFee === 0 ? 'text-green-600' : 'text-gray-900'}`}>
+                    {shippingFee === 0 ? 'FREE' : `${STORE_CONFIG.currency.symbol} ${shippingFee.toLocaleString()}`}
+                  </span>
                 </div>
                 <div className="flex justify-between text-base font-extrabold text-gray-900 pt-2 border-t border-[#E8E2DF]">
-                  <span>Total Authorized</span>
-                  <span className="text-[#D81B68]">${total.toFixed(2)}</span>
+                  <span>Total Amount</span>
+                  <span className="text-[#D81B68]">{STORE_CONFIG.currency.symbol} {total.toLocaleString()}</span>
                 </div>
               </div>
 
@@ -276,7 +323,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 onClick={handleCompleteOrder}
                 className="w-full bg-[#D81B68] hover:bg-[#A80F4F] text-white text-xs font-extrabold uppercase tracking-widest py-3.5 rounded-xl shadow-lg transition"
               >
-                AUTHORIZE & PLACE ORDER (${total.toFixed(2)})
+                PLACE ORDER ({STORE_CONFIG.currency.symbol} {total.toLocaleString()})
               </button>
             </div>
           )}
@@ -287,33 +334,39 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 <CheckCircle className="w-10 h-10" />
               </div>
               <h3 className="font-serif text-2xl md:text-3xl font-extrabold text-gray-900">
-                Order Confirmed!
+                Order Received!
               </h3>
               <p className="text-xs text-gray-600 max-w-md mx-auto leading-relaxed">
-                Thank you for your order, <strong>{shippingInfo.firstName}</strong>. Your artisanal VALORA handbag is being prepared at our atelier.
+                Thank you for your order, <strong>{address.fullName}</strong>. Your LUMANA handbag is being prepared for delivery.
               </p>
               
               <div className="bg-[#FAF8F6] p-4 rounded-xl border border-[#E8E2DF] max-w-sm mx-auto text-xs space-y-1.5">
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Order Reference:</span>
+                  <span className="text-gray-500">Order Number:</span>
                   <span className="font-bold text-[#D81B68]">{orderNumber}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Courier Tracking:</span>
-                  <span className="font-semibold text-gray-900">DHL Express Luxury (Pending dispatch)</span>
+                  <span className="text-gray-500">Payment Method:</span>
+                  <span className="font-semibold text-gray-900 uppercase">{paymentMethod}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Recipient Email:</span>
-                  <span className="font-semibold text-gray-900">{shippingInfo.email}</span>
+                  <span className="text-gray-500">Delivery Area:</span>
+                  <span className="font-semibold text-gray-900">{address.district}, {address.municipality}</span>
                 </div>
               </div>
 
-              <button
-                onClick={onClose}
-                className="bg-gray-900 hover:bg-black text-white text-xs font-bold uppercase tracking-widest px-8 py-3 rounded-xl shadow transition"
-              >
-                Return To Storefront
-              </button>
+              <div className="flex flex-col space-y-3">
+                <button
+                  onClick={onClose}
+                  className="bg-[#D81B68] hover:bg-[#A80F4F] text-white text-xs font-bold uppercase tracking-widest px-8 py-3 rounded-xl shadow transition"
+                >
+                  Continue Shopping
+                </button>
+                <div className="flex items-center justify-center space-x-2 text-xs text-gray-500">
+                  <Phone className="w-3 h-3" />
+                  <span>Support: {STORE_CONFIG.contact.phone}</span>
+                </div>
+              </div>
             </div>
           )}
         </div>

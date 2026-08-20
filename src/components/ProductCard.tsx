@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Heart, Eye, ShoppingBag, Check } from 'lucide-react';
 import { Product } from '../types';
 
+import { STORE_CONFIG } from '../config';
+
 interface ProductCardProps {
   product: Product;
   isWishlisted: boolean;
@@ -98,11 +100,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           {/* PRICES */}
           <div className="flex items-center space-x-2 my-2">
             <span className="text-sm font-extrabold text-gray-900">
-              ${product.price.toFixed(2)}
+              {STORE_CONFIG.currency.symbol} {product.price.toLocaleString()}
             </span>
             {product.originalPrice && (
               <span className="text-xs text-gray-400 line-through font-normal">
-                ${product.originalPrice.toFixed(2)}
+                {STORE_CONFIG.currency.symbol} {product.originalPrice.toLocaleString()}
               </span>
             )}
           </div>

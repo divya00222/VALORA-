@@ -1,6 +1,6 @@
 {
-  "name": "VALORA Handbags",
-  "description": "A luxury e-commerce website for premium handcrafted handbags, shoulder bags, totes, and fashion accessories.",
+  "name": "LUMANA Luxury Handbags",
+  "description": "Premium handcrafted handbags designed for modern Nepal. Nationwide delivery with Cash on Delivery and digital payment options.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

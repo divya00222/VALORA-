@@ -51,24 +51,24 @@ export default function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
-  const [currency, setCurrency] = useState('USD');
+  const [currency, setCurrency] = useState('NPR');
   const [toast, setToast] = useState<{ message: string; show: boolean }>({ message: '', show: false });
 
   // Load cart and wishlist from localStorage
   useEffect(() => {
-    const savedCart = localStorage.getItem('valora_cart');
-    const savedWishlist = localStorage.getItem('valora_wishlist');
+    const savedCart = localStorage.getItem('lumana_cart');
+    const savedWishlist = localStorage.getItem('lumana_wishlist');
     if (savedCart) setCart(JSON.parse(savedCart));
     if (savedWishlist) setWishlist(JSON.parse(savedWishlist));
   }, []);
 
   // Save cart and wishlist to localStorage
   useEffect(() => {
-    localStorage.setItem('valora_cart', JSON.stringify(cart));
+    localStorage.setItem('lumana_cart', JSON.stringify(cart));
   }, [cart]);
 
   useEffect(() => {
-    localStorage.setItem('valora_wishlist', JSON.stringify(wishlist));
+    localStorage.setItem('lumana_wishlist', JSON.stringify(wishlist));
   }, [wishlist]);
 
   // Toast effect
@@ -151,7 +151,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-white font-sans text-gray-900 selection:bg-pink-100 selection:text-[#D81B68]">
+    <div className="min-h-screen bg-white font-sans text-gray-900 selection:bg-[#D81B68]/10 selection:text-[#D81B68]">
       <AnnouncementBar currency={currency} onCurrencyChange={setCurrency} />
       
       <Header 

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Phone, Mail, MapPin, Facebook, Instagram, Twitter, Youtube } from 'lucide-react';
+import { STORE_CONFIG } from '../config';
 
 interface FooterProps {
   onNavigateTab: (tab: string) => void;
@@ -20,15 +21,15 @@ export const Footer: React.FC<FooterProps> = ({
             onClick={() => onNavigateTab('home')}
           >
             <span className="font-serif text-2xl font-extrabold tracking-widest text-gray-900 block">
-              VALORA
+              {STORE_CONFIG.name}
             </span>
-            <span className="text-[10px] tracking-[0.2em] uppercase text-gray-400 font-sans block mt-0.5">
-              Handbags & Accessories
+            <span className="text-[10px] tracking-[0.2em] uppercase text-[#D81B68] font-bold block mt-0.5">
+              {STORE_CONFIG.tagline}
             </span>
           </div>
 
           <p className="text-gray-500 text-xs leading-relaxed">
-            We bring you premium quality handcrafted leather handbags that combine style, elegance, and lifetime functionality.
+            Preserving the heritage of Kathmandu through exquisite handcrafted artistry. Luxury made in Nepal.
           </p>
 
           <div className="flex items-center space-x-3 pt-2 text-gray-600">
@@ -226,15 +227,15 @@ export const Footer: React.FC<FooterProps> = ({
           <ul className="space-y-2.5 text-gray-600 font-medium">
             <li className="flex items-center space-x-2">
               <Phone className="w-3.5 h-3.5 text-[#D81B68] flex-shrink-0" />
-              <span>+1 (800) 555-8256</span>
+              <span>{STORE_CONFIG.contact.phone}</span>
             </li>
             <li className="flex items-center space-x-2">
               <Mail className="w-3.5 h-3.5 text-[#D81B68] flex-shrink-0" />
-              <span>concierge@valorahandbags.com</span>
+              <span>{STORE_CONFIG.contact.email}</span>
             </li>
             <li className="flex items-start space-x-2">
               <MapPin className="w-3.5 h-3.5 text-[#D81B68] flex-shrink-0 mt-0.5" />
-              <span>740 Madison Avenue, New York, NY 10021</span>
+              <span>{STORE_CONFIG.contact.address}</span>
             </li>
           </ul>
         </div>
@@ -242,21 +243,21 @@ export const Footer: React.FC<FooterProps> = ({
 
       {/* BOTTOM FOOTER BAR */}
       <div className="max-w-7xl mx-auto px-4 pt-6 flex flex-col sm:flex-row items-center justify-between text-[11px] text-gray-500 gap-4">
-        <p>© 2026 VALORA Handbags Store. All Rights Reserved.</p>
+        <p>© 2026 {STORE_CONFIG.name}. All Rights Reserved.</p>
 
         {/* Payment Badges */}
         <div className="flex items-center space-x-2">
           <span className="bg-gray-100 border border-gray-200 text-gray-700 font-extrabold px-2 py-0.5 rounded text-[10px]">
-            VISA
+            COD
           </span>
           <span className="bg-gray-100 border border-gray-200 text-gray-700 font-extrabold px-2 py-0.5 rounded text-[10px]">
-            MC
+            eSewa
           </span>
           <span className="bg-gray-100 border border-gray-200 text-gray-700 font-extrabold px-2 py-0.5 rounded text-[10px]">
-            PayPal
+            Khalti
           </span>
           <span className="bg-gray-100 border border-gray-200 text-gray-700 font-extrabold px-2 py-0.5 rounded text-[10px]">
-            Pay
+            Fonepay
           </span>
         </div>
       </div>

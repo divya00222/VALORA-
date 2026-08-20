@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, User, Heart, ShoppingBag, Menu, X, ArrowRight } from 'lucide-react';
 import { Product, CartItem } from '../types';
+import { STORE_CONFIG } from '../config';
 
 interface HeaderProps {
   products: Product[];
@@ -78,10 +79,10 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex-shrink-0 cursor-pointer" onClick={() => onNavigateCatalog('')}>
           <div className="flex flex-col items-start">
             <span className="font-serif text-2xl md:text-3xl font-extrabold tracking-widest text-gray-900 leading-none">
-              VALORA
+              {STORE_CONFIG.name}
             </span>
-            <span className="text-[10px] md:text-[11px] tracking-[0.2em] uppercase text-gray-500 font-sans mt-0.5">
-              Handbags & Accessories
+            <span className="text-[10px] md:text-[11px] tracking-[0.2em] uppercase text-[#D81B68] font-bold mt-0.5">
+              {STORE_CONFIG.tagline}
             </span>
           </div>
         </div>
@@ -91,7 +92,7 @@ export const Header: React.FC<HeaderProps> = ({
           <form onSubmit={handleSearchSubmit} className="w-full relative">
             <input
               type="text"
-              placeholder="Search products..."
+              placeholder="Search handcrafted bags..."
               value={searchQuery}
               onChange={(e) => {
                 setSearchQuery(e.target.value);
@@ -147,10 +148,10 @@ export const Header: React.FC<HeaderProps> = ({
                           {product.category}
                         </p>
                         <p className="text-xs font-bold text-[#D81B68]">
-                          ${product.price.toFixed(2)}
+                          {STORE_CONFIG.currency.symbol} {product.price.toLocaleString()}
                           {product.originalPrice && (
                             <span className="text-gray-400 line-through text-[11px] ml-1.5 font-normal">
-                              ${product.originalPrice.toFixed(2)}
+                              {STORE_CONFIG.currency.symbol} {product.originalPrice.toLocaleString()}
                             </span>
                           )}
                         </p>
@@ -235,7 +236,7 @@ export const Header: React.FC<HeaderProps> = ({
         <form onSubmit={handleSearchSubmit} className="relative">
           <input
             type="text"
-            placeholder="Search products..."
+            placeholder="Search handcrafted bags..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full bg-[#FAF8F6] border border-[#E8E2DF] rounded-full py-2 pl-4 pr-10 text-xs text-gray-800 focus:outline-none focus:border-[#D81B68]"

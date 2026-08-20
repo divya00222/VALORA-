@@ -1,3 +1,18 @@
+export interface NepalAddress {
+  fullName: string;
+  mobileNumber: string;
+  email: string;
+  province: string;
+  district: string;
+  municipality: string;
+  wardNumber: string;
+  tole: string;
+  landmark?: string;
+  instructions?: string;
+}
+
+export type NepalPaymentMethod = 'cod' | 'esewa' | 'khalti' | 'fonepay' | 'connectips' | 'bank' | 'card';
+
 export interface Product {
   id: string;
   name: string;
