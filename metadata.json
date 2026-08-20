@@ -1,0 +1,6 @@
+{
+  "name": "VALORA Handbags",
+  "description": "A luxury e-commerce website for premium handcrafted handbags, shoulder bags, totes, and fashion accessories.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
